@@ -1,0 +1,75 @@
+{
+  "name": "distguard",
+  "version": "0.0.0",
+  "description": "Security gate for your build output — find leaked credentials and exposed source maps in dist before you ship.",
+  "type": "module",
+  "license": "MIT",
+  "author": "lvyanyan <lvyanyan91@foxmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvyanyan/distguard.git"
+  },
+  "keywords": [
+    "security",
+    "secrets",
+    "scanner",
+    "bundle",
+    "dist",
+    "sourcemap",
+    "cli",
+    "ci"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.29.2",
+  "bin": {
+    "distguard": "./dist/cli.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "oxlint src test && oxfmt --check src test scripts",
+    "fmt": "oxfmt src test scripts",
+    "rules:doc": "tsx scripts/gen-rules-doc.ts",
+    "postinstall": "simple-git-hooks"
+  },
+  "dependencies": {
+    "mri": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "lint-staged": "^17.3.0",
+    "oxfmt": "^0.65.0",
+    "oxlint": "^1.80.0",
+    "simple-git-hooks": "^2.13.1",
+    "tsdown": "^0.22.14",
+    "tsx": "^4.23.12",
+    "typescript": "~5.9.0",
+    "vitest": "^4.1.11"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,mts,cts,js,mjs,cjs}": [
+      "oxlint --fix",
+      "oxfmt"
+    ]
+  }
+}
