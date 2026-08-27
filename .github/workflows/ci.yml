@@ -9,8 +9,10 @@ jobs:
   test:
     strategy:
       fail-fast: false
+      # runtime supports node >=20 (see engines); the BUILD toolchain
+      # (tsdown) requires 22+, so CI builds on modern LTS lines
       matrix:
-        node-version: [20, 24]
+        node-version: [22, 24]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
