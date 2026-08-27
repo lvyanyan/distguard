@@ -1,6 +1,6 @@
 {
   "name": "distguard",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Security gate for your build output — find leaked credentials and exposed source maps in dist before you ship.",
   "type": "module",
   "license": "MIT",
@@ -55,7 +55,7 @@
     "lint": "oxlint src test && oxfmt --check src test scripts",
     "fmt": "oxfmt src test scripts",
     "rules:doc": "tsx scripts/gen-rules-doc.ts",
-    "postinstall": "simple-git-hooks"
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "mri": "^1.2.0"
