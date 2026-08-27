@@ -36,6 +36,11 @@
     },
     "./package.json": "./package.json"
   },
+  "tsdown": {
+    "entry": ["src/index.ts", "src/cli.ts"],
+    "format": "esm",
+    "dts": true
+  },
   "files": [
     "dist"
   ],
