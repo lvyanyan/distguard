@@ -1,6 +1,6 @@
-import { writeFileSync } from 'node:fs'
-import { RULES } from '../src/rules'
-import { SEVERITY_ORDER } from '../src/engine/severity'
+import { writeFileSync } from "node:fs";
+import { RULES } from "../src/rules";
+import { SEVERITY_ORDER } from "../src/engine/severity";
 
 /**
  * Generates RULES.md from rule metadata so documentation cannot drift
@@ -10,7 +10,7 @@ const sorted = [...RULES].sort(
   (a, b) =>
     SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) ||
     a.id.localeCompare(b.id),
-)
+);
 
 const header = `# Rule catalog
 
@@ -20,14 +20,13 @@ ${sorted.length} rules ship with this version. Every finding links to remediatio
 
 | rule id | severity | category | detects |
 | --- | --- | --- | --- |
-`
+`;
 
 const rows = sorted
   .map(
-    rule =>
-      `| \`${rule.id}\` | **${rule.severity}** | ${rule.category} | ${rule.description} |`,
+    (rule) => `| \`${rule.id}\` | **${rule.severity}** | ${rule.category} | ${rule.description} |`,
   )
-  .join('\n')
+  .join("\n");
 
-writeFileSync(new URL('../RULES.md', import.meta.url), header + rows + '\n')
-console.log(`RULES.md generated (${sorted.length} rules)`)
+writeFileSync(new URL("../RULES.md", import.meta.url), header + rows + "\n");
+console.log(`RULES.md generated (${sorted.length} rules)`);

@@ -1,9 +1,9 @@
-import type { ScanReport } from '../engine/types'
+import type { ScanReport } from "../engine/types";
 
 export function renderJson(report: ScanReport, version: string): string {
   return JSON.stringify(
     {
-      tool: 'distguard',
+      tool: "distguard",
       version,
       scannedFiles: report.scannedFiles,
       summary: report.bySeverity,
@@ -19,5 +19,5 @@ export function renderJson(report: ScanReport, version: string): string {
     },
     null,
     2,
-  )
+  );
 }

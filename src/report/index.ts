@@ -1,2 +1,2 @@
-export * from './json'
-export * from './terminal'
+export * from "./json";
+export * from "./terminal";
