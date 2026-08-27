@@ -1,6 +1,6 @@
 {
   "name": "distguard",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Security gate for your build output — find leaked credentials and exposed source maps in dist before you ship.",
   "type": "module",
   "license": "MIT",
@@ -37,12 +37,16 @@
     "./package.json": "./package.json"
   },
   "tsdown": {
-    "entry": ["src/index.ts", "src/cli.ts"],
+    "entry": [
+      "src/index.ts",
+      "src/cli.ts"
+    ],
     "format": "esm",
     "dts": true
   },
   "files": [
-    "dist"
+    "dist",
+    "RULES.md"
   ],
   "scripts": {
     "build": "tsdown",
