@@ -17,13 +17,13 @@ npx distguard ./dist --fail-on high  # red-light the pipeline on high+ findings
 
 ## What it detects
 
-18 rules across three severity tiers — full catalog with remediation guidance in [RULES.md](./RULES.md):
+26 rules across three severity tiers — full catalog with remediation guidance in [RULES.md](./RULES.md):
 
 | tier | examples |
 | --- | --- |
-| **critical** | AWS access keys · Stripe live secret keys · private key blocks · GitHub / npm / GCP-OAuth tokens |
-| **high** | Google API & OpenAI keys · Slack tokens · SendGrid / Twilio / Shopify credentials · inline basic-auth URLs |
-| **medium / low** | hardcoded JWTs · Firebase database URLs · internal network addresses · restorable & bare source maps |
+| **critical** | AWS / Alibaba Cloud access keys · Azure storage account keys · Stripe live secret keys · private key blocks · GitHub / npm / GitLab / GCP-OAuth tokens |
+| **high** | Google / OpenAI / Anthropic API keys · Slack / Telegram / Discord tokens · SendGrid / Twilio / Shopify / DigitalOcean credentials · inline basic-auth URLs |
+| **medium / low** | hardcoded JWTs · Hugging Face tokens · Firebase database URLs · internal network addresses · restorable & bare source maps |
 
 Every finding is **redacted**, anchored to `file:line:column` with a masked code frame, and explained: *why it's dangerous → how to fix it → authoritative reference*.
 

@@ -105,6 +105,11 @@ describe("rules: openai / slack / sendgrid / twilio / shopify", () => {
     expect(hitPreviews("openai-secret-key", `t="${stripeStyle}"`)).toHaveLength(0);
   });
 
+  it("openai-secret-key leaves anthropic keys to their own rule", () => {
+    const anthropicKey = ["sk-ant-", "api03-", "z".repeat(40)].join("");
+    expect(hitPreviews("openai-secret-key", `t="${anthropicKey}"`)).toHaveLength(0);
+  });
+
   it("slack-token matches known token families only", () => {
     expect(hitPreviews("slack-token", `t="xoxb-${"1".repeat(10)}abcdef"`)).toHaveLength(1);
     expect(hitPreviews("slack-token", 't="xoxn-not-a-family"')).toHaveLength(0);
@@ -170,6 +175,59 @@ describe("rules: exposure family", () => {
     expect(
       hitPreviews("internal-network-url", 'api="http://example.com/192.168.0.1"'),
     ).toHaveLength(0);
+  });
+});
+
+describe("rules: anthropic / gitlab / telegram / discord / azure / alibaba / digitalocean / huggingface", () => {
+  it("anthropic-api-key fires on full keys", () => {
+    const valid = ["sk-ant-", "api03-", "x".repeat(30)].join("");
+    expect(hitPreviews("anthropic-api-key", `t="${valid}"`)).toHaveLength(1);
+    expect(hitPreviews("anthropic-api-key", 't="sk-ant-short"')).toHaveLength(0);
+  });
+
+  it("gitlab-pat requires the glpat prefix and 20+ char body", () => {
+    const valid = ["glpat-", "X1".repeat(12)].join("");
+    expect(hitPreviews("gitlab-pat", `t="${valid}"`)).toHaveLength(1);
+    expect(hitPreviews("gitlab-pat", `t="glpat-${"X1".repeat(9)}"`)).toHaveLength(0);
+  });
+
+  it("telegram-bot-token pairs bot id with the AA marker", () => {
+    const valid = ["1234567890", ":AA", "a".repeat(33)].join("");
+    expect(hitPreviews("telegram-bot-token", `bot="${valid}"`)).toHaveLength(1);
+    const wrongMarker = ["1234567890", ":AB", "a".repeat(33)].join("");
+    expect(hitPreviews("telegram-bot-token", `bot="${wrongMarker}"`)).toHaveLength(0);
+  });
+
+  it("discord-bot-token enforces all three segments", () => {
+    const valid = ["M", "a".repeat(23), ".", "b".repeat(6), ".", "c".repeat(27)].join("");
+    expect(hitPreviews("discord-bot-token", `t="${valid}"`)).toHaveLength(1);
+    const broken = ["M", "a".repeat(23), ".", "b".repeat(5), ".", "c".repeat(27)].join("");
+    expect(hitPreviews("discord-bot-token", `t="${broken}"`)).toHaveLength(0);
+  });
+
+  it("azure-storage-account-key anchors on AccountKey= and 88 base64 chars", () => {
+    const valid = ["AccountKey=", "a".repeat(86), "=="].join("");
+    expect(hitPreviews("azure-storage-account-key", `t="${valid}"`)).toHaveLength(1);
+    expect(
+      hitPreviews("azure-storage-account-key", `t="AccountKey=${"a".repeat(80)}=="`),
+    ).toHaveLength(0);
+  });
+
+  it("alibaba-accesskey-id mirrors the aws rule discipline", () => {
+    const valid = ["LTAI", "5t", "ABCDEFGH12"].join("");
+    expect(hitPreviews("alibaba-accesskey-id", `k="${valid}"`)).toHaveLength(1);
+    expect(hitPreviews("alibaba-accesskey-id", 'k="LTAI12345"')).toHaveLength(0);
+  });
+
+  it("digitalocean-token requires 64 hex chars after dop_v1_", () => {
+    const valid = ["dop_v1_", "a1".repeat(32)].join("");
+    expect(hitPreviews("digitalocean-token", `t="${valid}"`)).toHaveLength(1);
+    expect(hitPreviews("digitalocean-token", `t="dop_v1_${"a1".repeat(31)}"`)).toHaveLength(0);
+  });
+
+  it("huggingface-token matches standard length", () => {
+    expect(hitPreviews("huggingface-token", `t="hf_${"a".repeat(34)}"`)).toHaveLength(1);
+    expect(hitPreviews("huggingface-token", `t="hf_${"a".repeat(33)}"`)).toHaveLength(0);
   });
 });
 

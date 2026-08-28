@@ -101,6 +101,37 @@ export const RULES: Rule[] = [
     reference: "https://developers.google.com/identity/protocols/oauth2",
     pattern: /\b(GOCSPX-[A-Za-z0-9_-]{28,})\b/,
   },
+  {
+    id: "azure-storage-account-key",
+    severity: "critical",
+    category: "credential",
+    description: "Azure Storage account key embedded in build output",
+    why: "The account key grants full control of the storage account — blobs, queues, tables and file shares — without any further authentication.",
+    fix: "Regenerate the key in the Azure portal, prefer SAS tokens or managed identity, and keep storage access server-side.",
+    reference: "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage",
+    // 64-byte keys render as exactly 88 base64 chars ending in '=='
+    pattern: /AccountKey=[A-Za-z0-9+/]{86}==/,
+  },
+  {
+    id: "alibaba-accesskey-id",
+    severity: "critical",
+    category: "credential",
+    description: "Alibaba Cloud access key id embedded in build output",
+    why: "An AccessKey id alone does not authenticate, but paired with a leaked AccessKey secret it grants full programmatic access to the linked Alibaba Cloud account.",
+    fix: "Rotate the key pair in the RAM console and remove it from source; serve cloud credentials from your backend instead of bundling them.",
+    reference: "https://help.aliyun.com/zh/ram/user-guide/create-an-accesskeypair",
+    pattern: /\bLTAI[0-9A-Za-z]{12,20}\b/,
+  },
+  {
+    id: "gitlab-pat",
+    severity: "critical",
+    category: "credential",
+    description: "GitLab personal access token embedded in build output",
+    why: "Depending on its scopes a GitLab PAT can read private repositories, publish packages or administer the instance — a direct supply-chain lever.",
+    fix: "Revoke the token in GitLab user settings, audit recent usage, and reissue with minimal scopes stored in CI variables.",
+    reference: "https://docs.gitlab.com/user/profile/personal_access_tokens/",
+    pattern: /\bglpat-[0-9A-Za-z_-]{20,}\b/,
+  },
 
   {
     id: "google-api-key",
@@ -120,9 +151,20 @@ export const RULES: Rule[] = [
     why: "The key authorizes paid model usage against your organization until revoked — direct financial abuse surface.",
     fix: "Rotate the key in the OpenAI dashboard and route inference calls through your backend with spend limits.",
     reference: "https://platform.openai.com/docs/api-reference/authentication",
-    // keep clear of stripe's sk_live_/sk_test_ prefixes
-    pattern: /\b(sk-(?!live_|test_)[A-Za-z0-9_-]{40,})\b/,
+    // keep clear of stripe's sk_live_/sk_test_ prefixes and anthropic's sk-ant-
+    pattern: /\bsk-(?!live_|test_|ant-)[A-Za-z0-9_-]{40,}\b/,
   },
+  {
+    id: "anthropic-api-key",
+    severity: "high",
+    category: "credential",
+    description: "Anthropic API key embedded in build output",
+    why: "The key authorizes paid model usage against your Anthropic organization until revoked — direct financial abuse surface.",
+    fix: "Rotate the key in the Anthropic console and route inference calls through your backend with spend limits.",
+    reference: "https://docs.anthropic.com/en/api/getting-started",
+    pattern: /\bsk-ant-[A-Za-z0-9_-]{24,}\b/,
+  },
+
   {
     id: "slack-token",
     severity: "high",
@@ -164,6 +206,38 @@ export const RULES: Rule[] = [
     pattern: /\b(shpat_[a-fA-F0-9]{32})\b/,
   },
   {
+    id: "telegram-bot-token",
+    severity: "high",
+    category: "credential",
+    description: "Telegram bot token embedded in build output",
+    why: "A bot token lets anyone drive the bot over the Bot API — reading messages sent to it, posting as it and exfiltrating files.",
+    fix: "Revoke the token via @BotFather (/revoke) and deliver it to the bot process at runtime instead of bundling it.",
+    reference: "https://core.telegram.org/bots/api",
+    // the fixed 'AA' marker opens the 35-char secret section of every token
+    pattern: /\b[0-9]{8,10}:AA[A-Za-z0-9_-]{33}\b/,
+  },
+  {
+    id: "discord-bot-token",
+    severity: "high",
+    category: "credential",
+    description: "Discord bot token embedded in build output",
+    why: "Bot tokens authenticate the full Discord gateway and REST API — an attacker can read channels, send messages as the bot and dump guild data.",
+    fix: "Reset the token in the Discord developer portal, enable privileged-intent allowlists, and load it from server-side config.",
+    reference: "https://discord.com/developers/docs/reference#authentication",
+    // base64 snowflake.id.timestamp, three segments with fixed lengths
+    pattern: /\b[MN][A-Za-z0-9_-]{23}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27}\b/,
+  },
+  {
+    id: "digitalocean-token",
+    severity: "high",
+    category: "credential",
+    description: "DigitalOcean personal access token embedded in build output",
+    why: "A full-scope token manages droplets, databases and object storage — billable infrastructure an attacker can mine or destroy.",
+    fix: "Revoke the token in the DigitalOcean API settings and scope replacements to custom token scopes stored in CI variables.",
+    reference: "https://docs.digitalocean.com/reference/api/rest-api/",
+    pattern: /\bdop_v1_[a-f0-9]{64}\b/,
+  },
+  {
     id: "basic-auth-url",
     severity: "high",
     category: "credential",
@@ -194,6 +268,16 @@ export const RULES: Rule[] = [
     fix: "Verify the project’s database rules deny unauthenticated reads/writes and proxy database access via backend where possible.",
     reference: "https://firebase.google.com/docs/database/security",
     pattern: /https:\/\/[a-z0-9-]+\.firebaseio\.com|https:\/\/[a-z0-9-]+\.firebasedatabase\.app/i,
+  },
+  {
+    id: "huggingface-token",
+    severity: "medium",
+    category: "credential",
+    description: "Hugging Face access token embedded in build output",
+    why: "Tokens can read private models and datasets, and fine-grained write tokens can publish artifacts under your organization's name.",
+    fix: "Revoke the token in your Hugging Face settings, prefer fine-grained read-only tokens, and inject them at runtime.",
+    reference: "https://huggingface.co/docs/hub/security-tokens",
+    pattern: /\bhf_[A-Za-z0-9]{34,}\b/,
   },
   {
     id: "internal-network-url",
