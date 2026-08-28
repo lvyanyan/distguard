@@ -15,6 +15,10 @@ npx distguard ./dist --json          # machine-readable for CI
 npx distguard ./dist --fail-on high  # red-light the pipeline on high+ findings
 ```
 
+<p align="center">
+  <img src=".github/assets/demo.gif" alt="distguard scanning a demo build output — 9 findings across 4 severity tiers, exit code 1" width="720">
+</p>
+
 ## What it detects
 
 26 rules across three severity tiers — full catalog with remediation guidance in [RULES.md](./RULES.md):
