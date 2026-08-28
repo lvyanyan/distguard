@@ -1,6 +1,6 @@
 {
   "name": "distguard",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Security gate for your build output — find leaked credentials and exposed source maps in dist before you ship.",
   "type": "module",
   "license": "MIT",
